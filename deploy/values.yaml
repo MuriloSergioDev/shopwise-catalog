@@ -1,0 +1,17 @@
+# Values for shopwise-platform/charts/laravel-service. `name` and `image` are set by the Tiltfile.
+http:
+  workers: 1
+# catalog consumes nothing (ADR-0001).
+consumers: []
+scheduler:
+  # Runs the outbox relay.
+  enabled: true
+# Topics this service owns (it is the only producer).
+topics:
+  - name: catalog.product-published
+    partitions: 3
+  - name: catalog.variant-changed
+    partitions: 3
+env:
+  LOG_CHANNEL: stderr
+  OCTANE_SERVER: frankenphp
