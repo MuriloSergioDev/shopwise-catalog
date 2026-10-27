@@ -10,12 +10,12 @@ how to run PHP are described there and still apply.
   - `catalog.variant-changed` on variant create/update, full state (`schemas/events/catalog/variant-changed.v1.json`). Not recorded when an update changes nothing.
   - `catalog.product-published` when a draft goes live, with its active variants (`schemas/events/catalog/product-published.v1.json`).
 - **Consumes**: nothing.
-- **HTTP** (BFF only) — contract `shopwise-contracts/openapi/catalog.yaml`. Public: `GET /api/categories`, `GET /api/products` (search, filters, facets), `GET /api/products/{slug}`. Admin (`auth.jwt:admin`): `POST /api/admin/products`, `POST /api/admin/products/{id}/publish`, `PATCH /api/admin/variants/{id}`.
+- **HTTP** (BFF only) — contract `shopwise-contracts/openapi/catalog.yaml`. Public: `GET /api/categories`, `GET /api/products` (search, filters, facets), `GET /api/products/{slug}`. Admin (`auth.jwt:admin`): `GET /api/admin/products` (drafts included, newest first), `GET /api/admin/products/{id}` (any status, inactive variants too), `POST /api/admin/products`, `POST /api/admin/products/{id}/publish`, `PATCH /api/admin/variants/{id}`.
 - **REST dependencies**: identity's JWKS (kit `Jwks`, `IDENTITY_JWKS_URL`) for admin routes only.
 - **Local URL**: http://localhost:8102 (Tilt port-forward).
 
 ## Rules
-- Storefront endpoints only show published products and active variants. Drafts exist so inventory and pricing can prepare SKUs before launch.
+- Storefront endpoints only show published products and active variants; admin reads show everything. Drafts exist so inventory and pricing can prepare SKUs before launch.
 - Reads go through `app/Queries` (no writes, no outbox); writes through `app/Actions`.
 - Search: Postgres uses the generated `products.search` column (`websearch_to_tsquery('english', …)`, ranked); SQLite tests fall back to LIKE per word. Keep both paths behaving the same for the tests.
 - Facets are counted without their own filter (category facet ignores `category`, `color` facet ignores `options[color]`).

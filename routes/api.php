@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\CreateProductController;
+use App\Http\Controllers\ListAdminProductsController;
 use App\Http\Controllers\ListCategoriesController;
 use App\Http\Controllers\PublishProductController;
 use App\Http\Controllers\SearchProductsController;
+use App\Http\Controllers\ShowAdminProductController;
 use App\Http\Controllers\ShowProductController;
 use App\Http\Controllers\UpdateVariantController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +19,9 @@ Route::get('/products', SearchProductsController::class)->name('products.index')
 Route::get('/products/{slug}', ShowProductController::class)->name('products.show');
 
 Route::middleware('auth.jwt:admin')->prefix('admin')->name('admin.')->group(function (): void {
+    // Admin reads see drafts and inactive variants too.
+    Route::get('/products', ListAdminProductsController::class)->name('products.index');
+    Route::get('/products/{product}', ShowAdminProductController::class)->name('products.show');
     Route::post('/products', CreateProductController::class)->name('products.store');
     Route::post('/products/{product}/publish', PublishProductController::class)->name('products.publish');
     Route::patch('/variants/{variant}', UpdateVariantController::class)->name('variants.update');
